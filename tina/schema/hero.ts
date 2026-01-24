@@ -1,0 +1,116 @@
+import type { Template } from 'tinacms';
+import { iconSchema } from '../fields/icon';
+
+export const heroBlockSchema: Template = {
+    name: 'hero',
+    label: 'Hero',
+    ui: {
+        previewSrc: '/blocks/hero.png',
+        defaultItem: {
+            tagline: "Here's some text above the other text",
+            headline: 'This Big Text is Totally Awesome',
+            text: 'Phasellus scelerisque, libero eu finibus rutrum, risus risus accumsan libero, nec molestie urna dui a leo.',
+        },
+    },
+    fields: [
+        {
+            type: 'object',
+            label: 'Slides',
+            name: 'slides',
+            list: true,
+            ui: {
+                defaultItem: {
+                    alt: 'Promo slide',
+                },
+                itemProps: (item) => ({
+                    label: item?.alt || item?.src?.split('/').pop() || 'Slide',
+                }),
+            },
+            fields: [
+                {
+                    name: 'src',
+                    label: 'Image Source',
+                    type: 'image',
+                    description: 'Upload a promo image or featured card',
+                },
+                {
+                    name: 'alt',
+                    label: 'Alt Text',
+                    type: 'string',
+                    description: 'Description of the image for accessibility',
+                },
+                {
+                    name: 'videoUrl',
+                    label: 'Video URL (Optional)',
+                    type: 'string',
+                    description: 'If using a YouTube video, make sure to use the embed version of the video URL',
+                },
+                {
+                    label: 'Actions',
+                    name: 'actions',
+                    type: 'object',
+                    list: true,
+                    ui: {
+                        defaultItem: {
+                            label: 'Action Label',
+                            type: 'button',
+                            icon: {
+                                name: 'Tina',
+                                color: 'white',
+                                style: 'float',
+                            },
+                            link: '/',
+                        },
+                        itemProps: (item) => ({ label: item.label }),
+                    },
+                    fields: [
+                        {
+                            label: 'Label',
+                            name: 'label',
+                            type: 'string',
+                        },
+                        {
+                            label: 'Type',
+                            name: 'type',
+                            type: 'string',
+                            options: [
+                                { label: 'Button', value: 'button' },
+                                { label: 'Link', value: 'link' },
+                            ],
+                        },
+                        iconSchema as any,
+                        {
+                            label: 'Link',
+                            name: 'link',
+                            type: 'string',
+                        },
+                    ],
+                },
+            ],
+        },
+        {
+            type: 'object',
+            label: 'Image (Legacy - use Slides instead)',
+            name: 'image',
+            description: 'Deprecated: Use Slides field above for better slider functionality',
+            fields: [
+                {
+                    name: 'src',
+                    label: 'Image Source',
+                    type: 'image',
+                },
+                {
+                    name: 'alt',
+                    label: 'Alt Text',
+                    type: 'string',
+                },
+                {
+                    name: 'videoUrl',
+                    label: 'Video URL',
+                    type: 'string',
+                    description: 'If using a YouTube video, make sure to use the embed version of the video URL',
+                },
+            ],
+        },
+    ],
+};

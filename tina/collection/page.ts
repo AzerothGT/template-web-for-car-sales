@@ -1,5 +1,5 @@
 import type { Collection } from 'tinacms';
-import { heroBlockSchema } from '@/components/blocks/hero';
+import { heroBlockSchema } from '@/tina/schema/hero';
 import { contentBlockSchema } from '@/components/blocks/content';
 import { testimonialBlockSchema } from '@/components/blocks/testimonial';
 import { featureBlockSchema } from '@/components/blocks/features';

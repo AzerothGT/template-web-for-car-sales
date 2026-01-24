@@ -1,18 +1,27 @@
 'use client';
-import { iconSchema } from '@/tina/fields/icon';
+
+
 import Image from 'next/image';
 import Link from 'next/link';
 import * as React from 'react';
-import type { Template } from 'tinacms';
 import { tinaField } from 'tinacms/dist/react';
-import { PageBlocksHero, PageBlocksHeroImage } from '../../tina/__generated__/types';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { Transition } from 'motion/react';
+
+import { PageBlocksHero, PageBlocksHeroSlides } from '../../tina/__generated__/types';
 import { Icon } from '../icon';
-import { Section, sectionBlockSchemaField } from '../layout/section';
+import { Section } from '../layout/section';
 import { AnimatedGroup } from '../motion-primitives/animated-group';
-import { TextEffect } from '../motion-primitives/text-effect';
 import { Button } from '../ui/button';
 import HeroVideoDialog from '../ui/hero-video-dialog';
-import { Transition } from 'motion/react';
+
+// ============================================================================
+// Constants
+// ============================================================================
+
+const AUTOPLAY_INTERVAL_MS = 5000;
+const SLIDE_TRANSITION_MS = 700;
+
 const transitionVariants = {
   container: {
     visible: {
@@ -41,183 +50,297 @@ const transitionVariants = {
   },
 };
 
-export const Hero = ({ data }: { data: PageBlocksHero }) => {
-  // Extract the background style logic into a more readable format
-  let gradientStyle: React.CSSProperties | undefined = undefined;
-  if (data.background) {
-    const colorName = data.background
-      .replace(/\/\d{1,2}$/, '')
-      .split('-')
-      .slice(1)
-      .join('-');
-    const opacity = data.background.match(/\/(\d{1,3})$/)?.[1] || '100';
+// ============================================================================
+// Utility Functions
+// ============================================================================
 
-    gradientStyle = {
-      '--tw-gradient-to': `color-mix(in oklab, var(--color-${colorName}) ${opacity}%, transparent)`,
-    } as React.CSSProperties;
+/**
+ * Normalizes slides data, supporting both new slides array and legacy single image
+ */
+function getSlides(data: PageBlocksHero): PageBlocksHeroSlides[] {
+  if (data.slides && data.slides.length > 0) {
+    return data.slides as PageBlocksHeroSlides[];
   }
+  if (data.image) {
+    return [data.image as PageBlocksHeroSlides];
+  }
+  return [];
+}
+
+/**
+ * Extracts YouTube video ID from embed URL
+ */
+function extractYouTubeVideoId(url: string): string {
+  const embedPrefix = '/embed/';
+  const idx = url.indexOf(embedPrefix);
+  if (idx !== -1) {
+    return url.substring(idx + embedPrefix.length).split('?')[0];
+  }
+  return '';
+}
+
+/**
+ * Gets YouTube thumbnail URL from video ID
+ */
+function getYouTubeThumbnail(videoId: string): string {
+  return `https://i3.ytimg.com/vi/${videoId}/maxresdefault.jpg`;
+}
+
+// ============================================================================
+// Custom Hook for Slider Logic
+// ============================================================================
+
+interface UseSliderProps {
+  totalSlides: number;
+  autoplayInterval?: number;
+}
+
+interface UseSliderReturn {
+  currentSlide: number;
+  isAutoPlaying: boolean;
+  goToSlide: (index: number) => void;
+  nextSlide: () => void;
+  prevSlide: () => void;
+}
+
+function useSlider({ totalSlides, autoplayInterval = AUTOPLAY_INTERVAL_MS }: UseSliderProps): UseSliderReturn {
+  const [currentSlide, setCurrentSlide] = React.useState(0);
+  const [isAutoPlaying, setIsAutoPlaying] = React.useState(true);
+
+  // Auto-play functionality
+  React.useEffect(() => {
+    if (!isAutoPlaying || totalSlides <= 1) return;
+
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % totalSlides);
+    }, autoplayInterval);
+
+    return () => clearInterval(interval);
+  }, [isAutoPlaying, totalSlides, autoplayInterval]);
+
+  const goToSlide = React.useCallback((index: number) => {
+    setCurrentSlide(index);
+    setIsAutoPlaying(false);
+  }, []);
+
+  const nextSlide = React.useCallback(() => {
+    setCurrentSlide((prev) => (prev + 1) % totalSlides);
+    setIsAutoPlaying(false);
+  }, [totalSlides]);
+
+  const prevSlide = React.useCallback(() => {
+    setCurrentSlide((prev) => (prev - 1 + totalSlides) % totalSlides);
+    setIsAutoPlaying(false);
+  }, [totalSlides]);
+
+  return { currentSlide, isAutoPlaying, goToSlide, nextSlide, prevSlide };
+}
+
+// ============================================================================
+// Components
+// ============================================================================
+
+interface SlideNavigationProps {
+  currentSlide: number;
+  totalSlides: number;
+  onPrevious: () => void;
+  onNext: () => void;
+  onGoToSlide: (index: number) => void;
+}
+
+const SlideNavigation: React.FC<SlideNavigationProps> = ({
+  currentSlide,
+  totalSlides,
+  onPrevious,
+  onNext,
+  onGoToSlide,
+}) => {
+  if (totalSlides <= 1) return null;
 
   return (
-    <Section background={data.background!}>
-      <div className='text-center sm:mx-auto lg:mr-auto lg:mt-0'>
-        {data.headline && (
-          <div data-tina-field={tinaField(data, 'headline')}>
-            <TextEffect preset='fade-in-blur' speedSegment={0.3} as='h1' className='mt-8 text-balance text-6xl md:text-7xl xl:text-[5.25rem]'>
-              {data.headline!}
-            </TextEffect>
-          </div>
-        )}
-        {data.tagline && (
-          <div data-tina-field={tinaField(data, 'tagline')}>
-            <TextEffect per='line' preset='fade-in-blur' speedSegment={0.3} delay={0.5} as='p' className='mx-auto mt-8 max-w-2xl text-balance text-lg'>
-              {data.tagline!}
-            </TextEffect>
-          </div>
-        )}
+    <>
+      {/* Arrow Navigation */}
+      <button
+        onClick={onPrevious}
+        className='absolute left-4 top-1/2 -translate-y-1/2 z-20 bg-background/80 hover:bg-background backdrop-blur-sm rounded-full p-2 shadow-lg transition-all hover:scale-110 border border-border/50'
+        aria-label='Previous slide'
+      >
+        <ChevronLeft className='w-6 h-6' />
+      </button>
 
-        <AnimatedGroup variants={transitionVariants} className='mt-12 flex flex-col items-center justify-center gap-2 md:flex-row'>
-          {data.actions &&
-            data.actions.map((action) => (
-              <div key={action!.label} data-tina-field={tinaField(action)} className='bg-foreground/10 rounded-[calc(var(--radius-xl)+0.125rem)] border p-0.5'>
-                <Button asChild size='lg' variant={action!.type === 'link' ? 'ghost' : 'default'} className='rounded-xl px-5 text-base'>
+      <button
+        onClick={onNext}
+        className='absolute right-4 top-1/2 -translate-y-1/2 z-20 bg-background/80 hover:bg-background backdrop-blur-sm rounded-full p-2 shadow-lg transition-all hover:scale-110 border border-border/50'
+        aria-label='Next slide'
+      >
+        <ChevronRight className='w-6 h-6' />
+      </button>
+
+      {/* Dot Indicators */}
+      <div className='absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex gap-2'>
+        {Array.from({ length: totalSlides }).map((_, index) => (
+          <button
+            key={index}
+            onClick={() => onGoToSlide(index)}
+            className={`transition-all duration-300 rounded-full ${currentSlide === index
+              ? 'bg-primary w-8 h-2'
+              : 'bg-background/60 hover:bg-background/80 w-2 h-2'
+              }`}
+            aria-label={`Go to slide ${index + 1}`}
+          />
+        ))}
+      </div>
+    </>
+  );
+};
+
+interface SlideContentProps {
+  slide: PageBlocksHeroSlides;
+}
+
+const SlideContent: React.FC<SlideContentProps> = ({ slide }) => {
+  // Video slide
+  if (slide.videoUrl) {
+    const videoId = extractYouTubeVideoId(slide.videoUrl);
+    const thumbnailSrc = slide.src || (videoId ? getYouTubeThumbnail(videoId) : '');
+
+    return (
+      <div className='relative w-full h-full'>
+        <HeroVideoDialog
+          videoSrc={slide.videoUrl}
+          thumbnailSrc={thumbnailSrc}
+          thumbnailAlt='Hero Video'
+        />
+        {slide.actions && slide.actions.length > 0 && (
+          <div className='absolute bottom-8 left-1/2 -translate-x-1/2 z-30 flex flex-col sm:flex-row items-center justify-center gap-2'>
+            {slide.actions.map((action) => (
+              <div
+                key={action!.label}
+                data-tina-field={tinaField(action)}
+                className='bg-foreground/10 rounded-[calc(var(--radius-xl)+0.125rem)] border p-0.5'
+              >
+                <Button
+                  asChild
+                  size='lg'
+                  variant={action!.type === 'link' ? 'ghost' : 'default'}
+                  className='rounded-xl px-5 text-base shadow-xl'
+                >
                   <Link href={action!.link!}>
-                    {action?.icon && <Icon data={action?.icon} />}
+                    {action?.icon && <Icon data={action.icon} />}
                     <span className='text-nowrap'>{action!.label}</span>
                   </Link>
                 </Button>
               </div>
             ))}
-        </AnimatedGroup>
-      </div>
-
-      {data.image && (
-        <AnimatedGroup variants={transitionVariants}>
-          <div className='relative -mr-56 mt-8 overflow-hidden px-2 sm:mr-0 sm:mt-12 md:mt-20 max-w-full' data-tina-field={tinaField(data, 'image')}>
-            <div aria-hidden className='bg-linear-to-b absolute inset-0 z-10 from-transparent from-35% pointer-events-none' style={gradientStyle} />
-            <div className='inset-shadow-2xs ring-background dark:inset-shadow-white/20 bg-background relative mx-auto max-w-6xl overflow-hidden rounded-2xl border p-4 shadow-lg shadow-zinc-950/15 ring-1'>
-              <ImageBlock image={data.image} />
-            </div>
           </div>
-        </AnimatedGroup>
-      )}
+        )}
+      </div>
+    );
+  }
+
+  // Image slide
+  if (slide.src) {
+    return (
+      <div className='relative w-full h-full'>
+        <Image
+          className='z-2 border-border/25 aspect-15/8 relative rounded-2xl border w-full h-full object-cover'
+          alt={slide.alt || 'Hero slide'}
+          src={slide.src}
+          fill
+          priority
+          sizes='(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px'
+        />
+        {slide.actions && slide.actions.length > 0 && (
+          <div className='absolute bottom-8 left-1/2 -translate-x-1/2 z-30 flex flex-col sm:flex-row items-center justify-center gap-2'>
+            {slide.actions.map((action) => (
+              <div
+                key={action!.label}
+                data-tina-field={tinaField(action)}
+                className='bg-foreground/10 backdrop-blur-sm rounded-[calc(var(--radius-xl)+0.125rem)] border p-0.5'
+              >
+                <Button
+                  asChild
+                  size='lg'
+                  variant={action!.type === 'link' ? 'ghost' : 'default'}
+                  className='rounded-xl px-5 text-base shadow-xl'
+                >
+                  <Link href={action!.link!}>
+                    {action?.icon && <Icon data={action.icon} />}
+                    <span className='text-nowrap'>{action!.label}</span>
+                  </Link>
+                </Button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  return null;
+};
+
+interface HeroSliderProps {
+  slides: PageBlocksHeroSlides[];
+  data: PageBlocksHero;
+}
+
+const HeroSlider: React.FC<HeroSliderProps> = ({ slides, data }) => {
+  const totalSlides = slides.length;
+  const { currentSlide, goToSlide, nextSlide, prevSlide } = useSlider({ totalSlides });
+
+  if (slides.length === 0) return null;
+
+  return (
+    <AnimatedGroup variants={transitionVariants}>
+      <div className='relative -mr-56 mt-8 overflow-hidden px-2 sm:mr-0 sm:mt-12 md:mt-20 max-w-full'>
+        <div className='inset-shadow-2xs ring-background dark:inset-shadow-white/20 bg-background relative mx-auto max-w-6xl overflow-hidden rounded-2xl border p-4 shadow-lg shadow-zinc-950/15 ring-1'>
+          <div className='relative overflow-hidden rounded-2xl'>
+            {/* Slides Container */}
+            <div className='relative' style={{ aspectRatio: '15/8' }}>
+              {slides.map((slide, index) => (
+                <div
+                  key={index}
+                  className='absolute inset-0 transition-all ease-in-out'
+                  style={{
+                    opacity: currentSlide === index ? 1 : 0,
+                    transform: `translateX(${(index - currentSlide) * 100}%)`,
+                    transitionDuration: `${SLIDE_TRANSITION_MS}ms`,
+                  }}
+                  data-tina-field={tinaField(data, 'slides', index)}
+                >
+                  <SlideContent slide={slide} />
+                </div>
+              ))}
+            </div>
+
+            {/* Navigation Controls */}
+            <SlideNavigation
+              currentSlide={currentSlide}
+              totalSlides={totalSlides}
+              onPrevious={prevSlide}
+              onNext={nextSlide}
+              onGoToSlide={goToSlide}
+            />
+          </div>
+        </div>
+      </div>
+    </AnimatedGroup>
+  );
+};
+
+// ============================================================================
+// Main Component
+// ============================================================================
+
+export const Hero: React.FC<{ data: PageBlocksHero }> = ({ data }) => {
+  const slides = getSlides(data);
+
+  return (
+    <Section background={data.background}>
+      <HeroSlider slides={slides} data={data} />
     </Section>
   );
 };
 
-const ImageBlock = ({ image }: { image: PageBlocksHeroImage }) => {
-  if (image.videoUrl) {
-    let videoId = '';
-    if (image.videoUrl) {
-      const embedPrefix = '/embed/';
-      const idx = image.videoUrl.indexOf(embedPrefix);
-      if (idx !== -1) {
-        videoId = image.videoUrl.substring(idx + embedPrefix.length).split('?')[0];
-      }
-    }
-    const thumbnailSrc = image.src ? image.src! : videoId ? `https://i3.ytimg.com/vi/${videoId}/maxresdefault.jpg` : '';
 
-    return <HeroVideoDialog videoSrc={image.videoUrl} thumbnailSrc={thumbnailSrc} thumbnailAlt='Hero Video' />;
-  }
-
-  if (image.src) {
-    return (
-      <Image
-        className='z-2 border-border/25 aspect-15/8 relative rounded-2xl border max-w-full h-auto'
-        alt={image!.alt || ''}
-        src={image!.src!}
-        height={4000}
-        width={3000}
-      />
-    );
-  }
-};
-
-export const heroBlockSchema: Template = {
-  name: 'hero',
-  label: 'Hero',
-  ui: {
-    previewSrc: '/blocks/hero.png',
-    defaultItem: {
-      tagline: "Here's some text above the other text",
-      headline: 'This Big Text is Totally Awesome',
-      text: 'Phasellus scelerisque, libero eu finibus rutrum, risus risus accumsan libero, nec molestie urna dui a leo.',
-    },
-  },
-  fields: [
-    sectionBlockSchemaField as any,
-    {
-      type: 'string',
-      label: 'Headline',
-      name: 'headline',
-    },
-    {
-      type: 'string',
-      label: 'Tagline',
-      name: 'tagline',
-    },
-    {
-      label: 'Actions',
-      name: 'actions',
-      type: 'object',
-      list: true,
-      ui: {
-        defaultItem: {
-          label: 'Action Label',
-          type: 'button',
-          icon: {
-              name: "Tina",
-              color: "white",
-              style: "float",
-          },
-          link: '/',
-        },
-        itemProps: (item) => ({ label: item.label }),
-      },
-      fields: [
-        {
-          label: 'Label',
-          name: 'label',
-          type: 'string',
-        },
-        {
-          label: 'Type',
-          name: 'type',
-          type: 'string',
-          options: [
-            { label: 'Button', value: 'button' },
-            { label: 'Link', value: 'link' },
-          ],
-        },
-        iconSchema as any,
-        {
-          label: 'Link',
-          name: 'link',
-          type: 'string',
-        },
-      ],
-    },
-    {
-      type: 'object',
-      label: 'Image',
-      name: 'image',
-      fields: [
-        {
-          name: 'src',
-          label: 'Image Source',
-          type: 'image',
-        },
-        {
-          name: 'alt',
-          label: 'Alt Text',
-          type: 'string',
-        },
-        {
-          name: 'videoUrl',
-          label: 'Video URL',
-          type: 'string',
-          description: 'If using a YouTube video, make sure to use the embed version of the video URL',
-        },
-      ],
-    },
-  ],
-};
