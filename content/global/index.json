@@ -28,6 +28,7 @@
     ]
   },
   "footer": {
+    "logoImage": "/uploads/logos/logosquare.svg",
     "social": [
       {
         "icon": {

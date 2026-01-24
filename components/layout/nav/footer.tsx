@@ -1,12 +1,19 @@
 "use client";
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Icon } from "../../icon";
 import { useLayout } from "../layout-context";
 
 export const Footer = () => {
   const { globalSettings } = useLayout();
   const { header, footer } = globalSettings!;
+
+  // Use footer logo if available, otherwise fallback to header
+  const logoImage = footer?.logoImage || header?.logoImage;
+  const logoIcon = footer?.icon || header?.icon;
+  const logoColor = footer?.color || header?.color;
+  const footerName = footer?.name || header?.name;
 
   return (
     <footer className="border-b bg-white pt-20 dark:bg-transparent">
@@ -15,12 +22,22 @@ export const Footer = () => {
 
           <div className="order-last flex justify-center md:order-first md:justify-start">
             <Link href="/" aria-label="go home">
-              <Icon
-                parentColor={header!.color!}
-                data={header!.icon}
-              />
+              {logoImage ? (
+                <Image
+                  src={logoImage}
+                  alt={footerName || "Logo"}
+                  width={80}
+                  height={80}
+                  className="h-8 w-auto object-contain"
+                />
+              ) : (
+                <Icon
+                  parentColor={logoColor!}
+                  data={logoIcon}
+                />
+              )}
             </Link>
-            <span className="self-center text-muted-foreground text-sm ml-2">© {new Date().getFullYear()} {header?.name}, All rights reserved</span>
+            <span className="self-center text-muted-foreground text-sm ml-2">© {new Date().getFullYear()} {footerName}, All rights reserved</span>
           </div>
 
           <div className="order-first flex justify-center gap-6 text-sm md:order-last md:justify-end">

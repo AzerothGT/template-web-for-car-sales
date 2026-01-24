@@ -74,6 +74,30 @@ const Global: Collection = {
       label: "Footer",
       name: "footer",
       fields: [
+        iconSchema as any,
+        {
+          type: "image",
+          label: "Logo Image",
+          name: "logoImage",
+          description: "Upload a custom logo image for footer (optional). If provided, this will be used instead of the icon.",
+          // @ts-ignore
+          uploadDir: () => "logos",
+        },
+        {
+          type: "string",
+          label: "Name",
+          name: "name",
+          description: "Footer name/text to display next to the logo",
+        },
+        {
+          type: "string",
+          label: "Color",
+          name: "color",
+          options: [
+            { label: "Default", value: "default" },
+            { label: "Primary", value: "primary" },
+          ],
+        },
         {
           type: "object",
           label: "Social Links",
