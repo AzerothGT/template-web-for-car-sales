@@ -1,11 +1,12 @@
 {
   "header": {
     "icon": {
-      "name": "BiSolidCar",
+      "name": "Tina",
       "color": "orange",
       "style": "float"
     },
-    "name": "Car Sales Website",
+    "logoImage": "/uploads/logos/logo.svg",
+    "name": "",
     "color": "default",
     "nav": [
       {

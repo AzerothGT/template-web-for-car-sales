@@ -19,6 +19,14 @@ const Global: Collection = {
       fields: [
         iconSchema as any,
         {
+          type: "image",
+          label: "Logo Image",
+          name: "logoImage",
+          description: "Upload a custom logo image (optional). If provided, this will be used instead of the icon.",
+          // @ts-ignore
+          uploadDir: () => "logos",
+        },
+        {
           type: "string",
           label: "Name",
           name: "name",

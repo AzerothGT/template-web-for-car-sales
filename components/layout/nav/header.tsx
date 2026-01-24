@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Icon } from "../../icon";
 import { useLayout } from "../layout-context";
 import { Menu, X } from "lucide-react";
@@ -23,14 +24,24 @@ export const Header = () => {
                 href="/"
                 aria-label="home"
                 className="flex items-center space-x-2">
-                <Icon
-                  parentColor={header.color!}
-                  data={{
-                    name: header.icon!.name,
-                    color: header.icon!.color,
-                    style: header.icon!.style,
-                  }}
-                />{" "}
+                {header.logoImage ? (
+                  <Image
+                    src={header.logoImage}
+                    alt={header.name || "Logo"}
+                    width={80}
+                    height={80}
+                    className="h-8 w-auto object-contain lg:h-10"
+                  />
+                ) : (
+                  <Icon
+                    parentColor={header.color!}
+                    data={{
+                      name: header.icon!.name,
+                      color: header.icon!.color,
+                      style: header.icon!.style,
+                    }}
+                  />
+                )}{" "}
                 <span>
                   {header.name}
                 </span>
