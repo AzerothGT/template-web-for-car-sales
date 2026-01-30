@@ -1,5 +1,6 @@
 import type { Template } from 'tinacms';
 import { iconSchema } from '../fields/icon';
+import { sectionBlockSchemaField } from '../../components/layout/section';
 
 export const heroBlockSchema: Template = {
     name: 'hero',
@@ -13,6 +14,7 @@ export const heroBlockSchema: Template = {
         },
     },
     fields: [
+        sectionBlockSchemaField as any,
         {
             type: 'object',
             label: 'Slides',
