@@ -337,7 +337,7 @@ export const Hero: React.FC<{ data: PageBlocksHero }> = ({ data }) => {
   const slides = getSlides(data);
 
   return (
-    <Section background={data.background}>
+    <Section background={data.background ?? undefined}>
       <HeroSlider slides={slides} data={data} />
     </Section>
   );
