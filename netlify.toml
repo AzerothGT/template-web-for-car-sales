@@ -1,0 +1,7 @@
+[build]
+  command = "bun run build"
+  publish = ".next"
+
+[build.environment]
+  # Increase Node.js memory limit to 4GB to prevent heap out of memory errors
+  NODE_OPTIONS = "--max-old-space-size=4096"
