@@ -243,7 +243,7 @@ const SlideContent: React.FC<SlideContentProps> = ({ slide }) => {
     return (
       <div className='relative w-full h-full'>
         <Image
-          className='z-2 border-border/25 aspect-15/8 relative rounded-2xl border w-full h-full object-cover'
+          className='z-2 aspect-21/9 relative rounded-2xl w-full h-full object-cover'
           alt={slide.alt || 'Hero slide'}
           src={slide.src}
           fill
@@ -293,11 +293,11 @@ const HeroSlider: React.FC<HeroSliderProps> = ({ slides, data }) => {
 
   return (
     <AnimatedGroup variants={transitionVariants}>
-      <div className='relative -mr-56 mt-8 overflow-hidden px-2 sm:mr-0 sm:mt-12 md:mt-20 max-w-full'>
-        <div className='inset-shadow-2xs ring-background dark:inset-shadow-white/20 bg-background relative mx-auto max-w-6xl overflow-hidden rounded-2xl border p-4 shadow-lg shadow-zinc-950/15 ring-1'>
+      <div className='relative -mr-56 overflow-hidden px-2 sm:mr-0 max-w-full'>
+        <div className='inset-shadow-2xs ring-background dark:inset-shadow-white/20 bg-background relative mx-auto max-w-6xl overflow-hidden rounded-2xl shadow-lg shadow-zinc-950/15'>
           <div className='relative overflow-hidden rounded-2xl'>
             {/* Slides Container */}
-            <div className='relative' style={{ aspectRatio: '15/8' }}>
+            <div className='relative' style={{ aspectRatio: '21/9' }}>
               {slides.map((slide, index) => (
                 <div
                   key={index}
@@ -337,7 +337,7 @@ export const Hero: React.FC<{ data: PageBlocksHero }> = ({ data }) => {
   const slides = getSlides(data);
 
   return (
-    <Section background={data.background ?? undefined} className="pt-20 pb-12">
+    <Section background={data.background ?? undefined} className="pt-2 pb-12">
       <HeroSlider slides={slides} data={data} />
     </Section>
   );
