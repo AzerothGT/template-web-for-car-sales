@@ -32,8 +32,11 @@ const bebasNeue = Bebas_Neue({
 });
 
 export const metadata: Metadata = {
-  title: "Tina",
-  description: "Tina Cloud Starter",
+  title: "Car Sales",
+  description: "Car Sales",
+  icons: {
+    icon: "/logosquare.svg",
+  },
 };
 
 export default function RootLayout({
