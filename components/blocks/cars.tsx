@@ -61,21 +61,21 @@ const CarCard: React.FC<PageBlocksCarsItems> = (data) => {
       </div>
 
       <CardContent className="p-6">
-        {/* Model */}
+        {/* Brand */}
         <h3
-          data-tina-field={tinaField(data, "model")}
+          data-tina-field={tinaField(data, "brand")}
           className="text-2xl font-bold mb-2 text-foreground"
         >
-          {data.model}
+          {data.brand}
         </h3>
 
-        {/* Brand */}
-        {data.brand && (
+        {/* Model */}
+        {data.model && (
           <p
-            data-tina-field={tinaField(data, "brand")}
+            data-tina-field={tinaField(data, "model")}
             className="text-muted-foreground mb-4"
           >
-            {data.brand}
+            {data.model}
           </p>
         )}
 
