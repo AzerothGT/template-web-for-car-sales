@@ -192,13 +192,13 @@ export const carsBlockSchema: Template = {
         },
         {
           type: "string",
-          label: "Model",
-          name: "model",
+          label: "Brand",
+          name: "brand",
         },
         {
           type: "string",
-          label: "Brand",
-          name: "brand",
+          label: "Model",
+          name: "model",
         },
         {
           type: "string",
