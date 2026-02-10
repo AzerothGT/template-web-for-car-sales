@@ -61,21 +61,21 @@ const CarCard: React.FC<PageBlocksCarsItems> = (data) => {
       </div>
 
       <CardContent className="p-6">
-        {/* Brand */}
+        {/* Model */}
         <h3
-          data-tina-field={tinaField(data, "brand")}
+          data-tina-field={tinaField(data, "model")}
           className="text-2xl font-bold mb-2 text-foreground"
         >
-          {data.brand}
+          {data.model}
         </h3>
 
-        {/* Model */}
-        {data.model && (
+        {/* Brand */}
+        {data.brand && (
           <p
-            data-tina-field={tinaField(data, "model")}
+            data-tina-field={tinaField(data, "brand")}
             className="text-muted-foreground mb-4"
           >
-            {data.model}
+            {data.brand}
           </p>
         )}
 
@@ -134,8 +134,8 @@ const CarCard: React.FC<PageBlocksCarsItems> = (data) => {
 };
 
 const defaultCar = {
-  brand: "Mercedes-Benz",
   model: "S-Class Sedan",
+  brand: "Mercedes-Benz",
   price: "$115,000",
   image: "/placeholder-car.jpg",
   badge: "New",
@@ -177,7 +177,7 @@ export const carsBlockSchema: Template = {
       ui: {
         itemProps: (item) => {
           return {
-            label: item?.brand + (item?.model ? ` - ${item.model}` : ''),
+            label: item?.model + (item?.brand ? ` - ${item.brand}` : ''),
           };
         },
         defaultItem: {
@@ -192,13 +192,13 @@ export const carsBlockSchema: Template = {
         },
         {
           type: "string",
-          label: "Brand",
-          name: "brand",
+          label: "Model",
+          name: "model",
         },
         {
           type: "string",
-          label: "Model",
-          name: "model",
+          label: "Brand",
+          name: "brand",
         },
         {
           type: "string",
