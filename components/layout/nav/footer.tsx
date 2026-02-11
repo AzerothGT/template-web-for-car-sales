@@ -16,7 +16,7 @@ export const Footer = () => {
   const footerName = footer?.name || header?.name;
 
   return (
-    <footer className="border-b bg-white pt-20 dark:bg-transparent">
+    <footer className="border-b pt-20 dark:bg-transparent" style={{ backgroundColor: '#e25c27' }}>
       <div className="mx-auto max-w-5xl px-6">
         <div className="mt-12 flex flex-wrap items-center gap-6 border-t py-6 flex-col md:flex-row md:justify-between">
 
