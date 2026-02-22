@@ -117,6 +117,55 @@ const Global: Collection = {
             },
           ],
         },
+        {
+          type: "object",
+          label: "Menu Columns",
+          name: "menuColumns",
+          list: true,
+          ui: {
+            itemProps: (item) => {
+              return { label: item?.title || "Column" };
+            },
+            defaultItem: {
+              title: "Column Title",
+              links: [],
+            },
+          },
+          fields: [
+            {
+              type: "string",
+              label: "Column Title",
+              name: "title",
+            },
+            {
+              type: "object",
+              label: "Links",
+              name: "links",
+              list: true,
+              ui: {
+                itemProps: (item) => {
+                  return { label: item?.label || "Link" };
+                },
+                defaultItem: {
+                  label: "Link",
+                  href: "/",
+                },
+              },
+              fields: [
+                {
+                  type: "string",
+                  label: "Label",
+                  name: "label",
+                },
+                {
+                  type: "string",
+                  label: "URL",
+                  name: "href",
+                },
+              ],
+            },
+          ],
+        },
       ],
     },
     {

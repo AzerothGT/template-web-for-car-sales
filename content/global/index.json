@@ -46,6 +46,29 @@
         },
         "url": "https://x.com/TinaCMS"
       }
+    ],
+    "menuColumns": [
+      {
+        "title": "Perusahaan",
+        "links": [
+          { "label": "Tentang Kami", "href": "/about" },
+          { "label": "Blog", "href": "/posts" }
+        ]
+      },
+      {
+        "title": "Layanan",
+        "links": [
+          { "label": "Produk Kami", "href": "/" },
+          { "label": "Harga", "href": "/" }
+        ]
+      },
+      {
+        "title": "Informasi",
+        "links": [
+          { "label": "Syarat & Ketentuan", "href": "/" },
+          { "label": "Kebijakan Privasi", "href": "/" }
+        ]
+      }
     ]
   },
   "theme": {
