@@ -25,6 +25,7 @@
   },
   "footer": {
     "logoImage": "/uploads/logos/logosquare.svg",
+    "color": "default",
     "social": [
       {
         "icon": {
