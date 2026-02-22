@@ -25,6 +25,7 @@
   },
   "footer": {
     "logoImage": "/uploads/logos/logosquare.svg",
+    "name": "Template Car",
     "color": "default",
     "social": [
       {
