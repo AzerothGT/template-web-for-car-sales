@@ -25,6 +25,8 @@
   },
   "footer": {
     "logoImage": "/uploads/logos/logosquare.svg",
+    "name": "Jual Mobil",
+    "color": "default",
     "social": [
       {
         "icon": {
